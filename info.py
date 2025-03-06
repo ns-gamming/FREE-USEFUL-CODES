@@ -3,7 +3,7 @@ from telegram import Update
 from telegram.ext import ApplicationBuilder, ContextTypes, MessageHandler, filters
 #use pip install python-Telegram-bot==20.0
 # Bot Token
-BOT_TOKEN = "your_token"
+BOT_TOKEN = "YOUR_BOT_TOKEN"
 
 # API Fetch Function
 def get_api_data(user_id):
