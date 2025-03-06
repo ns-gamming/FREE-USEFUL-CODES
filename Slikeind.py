@@ -15,7 +15,7 @@ def get_spam(ind: str, uid: str) -> dict:
 
 async def check_subscription(update: Update, context: CallbackContext) -> bool:
     user_id = update.message.from_user.id
-    chat_id = "-1002422057679"
+    chat_id = "CHAT_ID"
     member = await context.bot.get_chat_member(chat_id, user_id)
     return member.status in ['member', 'administrator', 'creator']
     
@@ -137,7 +137,7 @@ async def spam(update: Update, context: CallbackContext) -> None:
             time.sleep(2)
 
 def main():
-    application = Application.builder().token("7884222881:AAGb-KQrtr0w-C7NEC9NybjPQmUUhQ55zoo").build()
+    application = Application.builder().token("YOUR_BOT_TOKEN").build()
 
     application.add_handler(CommandHandler("like", like))
     application.add_handler(CommandHandler("spam", spam))
