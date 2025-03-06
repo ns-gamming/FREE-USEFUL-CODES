@@ -1,0 +1,134 @@
+import requests
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
+from datetime import datetime
+
+# Giữ nguyên Token bot
+BOT_TOKEN = 'Your Token Bot'
+
+# Lệnh /start
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user = update.effective_user
+    user_id = user.id
+    user_name = user.first_name
+    current_time = datetime.now().strftime("%I:%M:%S %p")
+    current_date = datetime.now().strftime("%Y-%m-%d")
+
+    welcome_message = f"""
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+✨ Welcome, {user_name}
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+👤 User Details:
+╭───────────────╮
+├ 🆔 User ID: {user_id}
+├ ⏰ Time: {current_time}
+├ 📅 Date: {current_date}
+╰───────────────╯
+
+📖 Commands:
+╭───────────────╮
+├ 📜 /help: View all available commands
+├ 🔄 /start: Restart the bot
+├ 🚙 /info <vehicle number>: Get Vehicle Info
+╰───────────────╯
+
+🇬🇧 English: First, you have to join our support group. Then you can use the bot.
+
+🇮🇳 हिंदी: सबसे पहले आपको हमारे सहायता समूह से जुड़ना होगा। उसके बाद आप इस बॉट का उपयोग कर सकते हैं.
+
+🔗 Join Us: 
+Click here to join our channel/group!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+😊 Enjoy your experience with the bot!
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+"""
+
+    # Thêm 2 button URL
+    keyboard = [
+      [InlineKeyboardButton("🔗 YouTube", url="buttonurl:https://www.youtube.com/@Nishant_sarkar")],
+      [InlineKeyboardButton("🔥 Free Fire Likes", url="https://t.me/NSfreefirelikesvip")]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+
+    await update.message.reply_text(welcome_message, reply_markup=reply_markup)
+
+# Lệnh /vh để lấy thông tin xe
+async def vehicle_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if len(context.args) == 0:
+        await update.message.reply_text("💡 Enter your vehicle number to fetch its details.", parse_mode="Markdown")
+        return
+
+    vehicle_number = context.args[0].upper()
+    api_url = f"https://vehicleinfo.taitanapi.workers.dev/?number={vehicle_number}"
+
+    # Hiển thị trạng thái "Đang soạn tin nhắn..."
+    await context.bot.send_chat_action(chat_id=update.effective_chat.id, action="typing")
+
+    try:
+        response = requests.get(api_url, timeout=5)  # Tăng tốc bằng timeout
+        data = response.json()
+
+        if "data" not in data:
+            await update.message.reply_text("💡 Enter your vehicle number to fetch its details.")
+            return
+
+        vehicle = data["data"]
+
+        # Hiển thị đầy đủ thông tin
+        vehicle_message = f"""
+╭─────────(🚗 *Vehicle Details* 🚗)──────────⦿
+│▸ 🔢 *Vehicle Number:* `{vehicle.get('VEHICLE_NUM', 'N/A')}`
+│▸ 🏢 *Brand:* `{vehicle.get('BRAND', 'N/A')}`
+│▸ 🚙 *Model:* `{vehicle.get('VEHICLE_MODEL', 'N/A')}`
+│▸ 👤 *Owner:* `{vehicle.get('NAME', 'N/A')}`
+│▸ 🛡️ *Role:* `{vehicle.get('ROLE', 'N/A')}`
+│▸ 🏦 *Insurance By:* `{vehicle.get('INSURANCE_BY', 'N/A')}`
+│▸ 📅 *Insurance Expiry:* `{vehicle.get('date_of_insurance_expiry', 'N/A')}`
+│▸ ⏳ *Days Left:* `{vehicle.get('DAYS_LEFT', 'N/A')}`
+│▸ 👥 *Owner Number:* `{vehicle.get('OWNER_NUM', 'N/A')}`
+│▸ 🏗️ *Commercial:* `{vehicle.get('isCommercial', 'N/A')}`
+│▸ 🗓️ *Registration Date:* `{vehicle.get('REG_DATE', 'N/A')}`
+│▸ 🤑 *Eligible for Sell:* `{vehicle.get('SELL_ELIGIBLE', 'N/A')}`
+│▸ 🛍️ *Eligible for Buy:* `{vehicle.get('OWNER', 'N/A')}`
+│▸ 🔍 *Probable Vehicle Number:* `{vehicle.get('VEHICLE_NUM', 'N/A')}`
+│▸ 🎂 *Vehicle Age:* `{vehicle.get('AGE', 'N/A')}`
+│▸ 🛡️ *Insurance Eligible:* `{vehicle.get('INSURANCE_ELIGIBLE', 'N/A')}`
+│▸ ❌ *Is Expired:* `{vehicle.get('IS_EXPIRED', 'N/A')}`
+│▸ ❌ *Insurance Expired:* `{vehicle.get('INSURANCE_EXPIRED', 'N/A')}`
+│▸ 📍 *Pincode:* `{vehicle.get('PINCODE', 'N/A')}`
+│▸ 🚘 *Probable Vehicle Type:* `{vehicle.get('VEHICLE_TYPE', 'N/A')}`
+│▸ 📲 *Source App:* `{vehicle.get('SRC_APP', 'N/A')}`
+│▸ 🛑 *Interstitial:* `{vehicle.get('INTERSTITIAL', 'N/A')}`
+│▸ 👤 *User ID:* `{vehicle.get('USERID', 'N/A')}`
+│▸ 📅 *Created At:* `{vehicle.get('CREATED_AT', 'N/A')}`
+│▸ 📆 *Expiring Today:* `{vehicle.get('expiringtoday', 'N/A')}`
+│▸ 📆 *Expiring in One Day:* `{vehicle.get('expiringinoneday', 'N/A')}`
+│▸ 🚗 *Vehicle Type:* `{vehicle.get('VEHICLE_TYPE', 'N/A')}`
+│▸ 🔒 *Is Logged:* `{vehicle.get('IS_LOGGED', 'N/A')}`
+│▸ 📱 *App Open Count:* `{vehicle.get('APP_OPEN', 'N/A')}`
+╰─────────({vehicle.get('NAME', 'N/A')})──────────⦿
+"""
+
+        # Thêm 2 button URL dưới kết quả
+        keyboard = [
+          [InlineKeyboardButton("🔗 YouTube", url="https://www.youtube.com/@Nishant_sarkar")],
+          [InlineKeyboardButton("🔥 Free Fire Likes", url="https://t.me/NSfreefirelikesvip")]
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+
+        await update.message.reply_text(vehicle_message, parse_mode="Markdown", reply_markup=reply_markup)
+
+    except Exception:
+        await update.message.reply_text("⚠️ Đã xảy ra lỗi khi lấy thông tin. Vui lòng thử lại sau.")
+
+# Khởi động bot
+if __name__ == '__main__':
+    app = ApplicationBuilder().token(BOT_TOKEN).build()
+
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(CommandHandler("info", vehicle_info))
+
+  print("🤖 Bot is running...")
+    app.run_polling()
