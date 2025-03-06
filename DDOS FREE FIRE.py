@@ -172,4 +172,4 @@ def main():
 if __name__ == "__main__":
     main()
     
-# Made BY LK-TEAM, use with responsibility, and at your owm risk.
+# Made BY NS-TEAM, use with responsibility, and at your owm risk.
